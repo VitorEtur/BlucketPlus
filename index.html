@@ -132,6 +132,7 @@
             transition: var(--transition);
             position: relative;
             overflow: hidden;
+            cursor: pointer;
         }
 
         .cta-button::before {
@@ -194,6 +195,7 @@
             transition: var(--transition);
             position: relative;
             overflow: hidden;
+            cursor: pointer;
         }
 
         .feature-card::before {
@@ -289,9 +291,10 @@
 
         .support-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 40px;
             margin-top: 50px;
+            align-items: stretch;
         }
 
         .support-option {
@@ -301,11 +304,32 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
             transition: var(--transition);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 200px;
         }
 
         .support-option:hover {
             background: rgba(255, 255, 255, 0.2);
             transform: translateY(-5px);
+        }
+
+        .support-option .feature-icon {
+            margin-bottom: 15px;
+        }
+
+        .support-option h3 {
+            margin-bottom: 10px;
+            flex-grow: 0;
+        }
+
+        .support-option p {
+            margin-bottom: 20px;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
         }
 
         .support-btn {
@@ -316,8 +340,10 @@
             border-radius: var(--border-radius);
             text-decoration: none;
             font-weight: 600;
-            margin-top: 20px;
             transition: var(--transition);
+            cursor: pointer;
+            align-self: center;
+            margin-top: auto;
         }
 
         .support-btn:hover {
@@ -351,6 +377,7 @@
             display: block;
             margin-bottom: 10px;
             transition: var(--transition);
+            cursor: pointer;
         }
 
         .footer-section a:hover {
@@ -393,6 +420,28 @@
 
             .support-grid {
                 grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .support-option {
+                min-height: auto;
+                padding: 25px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .support-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .support-option {
+                padding: 20px;
+                min-height: 180px;
+            }
+            
+            .support-btn {
+                padding: 10px 20px;
+                font-size: 0.9rem;
             }
         }
 
@@ -414,6 +463,20 @@
         .fade-in:nth-child(2) { animation-delay: 0.2s; }
         .fade-in:nth-child(3) { animation-delay: 0.3s; }
         .fade-in:nth-child(4) { animation-delay: 0.4s; }
+
+        /* Performance Optimizations */
+        .feature-card,
+        .support-option,
+        .cta-button,
+        .support-btn {
+            will-change: transform;
+        }
+
+        /* Preload critical fonts */
+        @font-face {
+            font-family: 'system-ui';
+            font-display: swap;
+        }
     </style>
 </head>
 <body>
@@ -527,23 +590,29 @@
             
             <div class="support-grid">
                 <div class="support-option fade-in">
-                    <span class="feature-icon">☕</span>
-                    <h3 data-i18n="kofiTitle">Buy me a coffee</h3>
-                    <p data-i18n="kofiDesc">Support development with a coffee donation</p>
+                    <div>
+                        <span class="feature-icon">☕</span>
+                        <h3 data-i18n="kofiTitle">Buy me a coffee</h3>
+                        <p data-i18n="kofiDesc">Support development with a coffee donation</p>
+                    </div>
                     <a href="https://ko-fi.com/hustlei" target="_blank" class="support-btn" data-i18n="kofiButton">Ko-fi</a>
                 </div>
                 
                 <div class="support-option fade-in">
-                    <span class="feature-icon">💰</span>
-                    <h3 data-i18n="pixTitle">PIX Donation</h3>
-                    <p data-i18n="pixDesc">Support via PIX (Brazilian payment system)</p>
+                    <div>
+                        <span class="feature-icon">💰</span>
+                        <h3 data-i18n="pixTitle">PIX Donation</h3>
+                        <p data-i18n="pixDesc">Support via PIX (Brazilian payment system)</p>
+                    </div>
                     <a href="#" onclick="showPixInfo()" class="support-btn" data-i18n="pixButton">PIX</a>
                 </div>
                 
                 <div class="support-option fade-in">
-                    <span class="feature-icon">💬</span>
-                    <h3 data-i18n="feedbackTitle">Send Feedback</h3>
-                    <p data-i18n="feedbackDesc">Share your ideas and help us improve</p>
+                    <div>
+                        <span class="feature-icon">💬</span>
+                        <h3 data-i18n="feedbackTitle">Send Feedback</h3>
+                        <p data-i18n="feedbackDesc">Share your ideas and help us improve</p>
+                    </div>
                     <a href="https://docs.google.com/forms/d/e/1FAIpQLSfTu6gMgMN7diWCaNauLYOVrwxt6COTwokKUHHA5qAWnY-aQA/viewform" target="_blank" class="support-btn" data-i18n="feedbackButton">Feedback</a>
                 </div>
             </div>
@@ -682,7 +751,7 @@
                 footerAboutDesc: "BucketPlus é um complemento do Google Sheets projetado para aumentar a produtividade através de ferramentas inteligentes de gerenciamento de cores e organização visual.",
                 footerLinksTitle: "Links Rápidos",
                 footerFeaturesLink: "Recursos",
-                footerSupportLink: "Apoio",
+                footerSupportLink: "Suporte",
                 footerFeedbackLink: "Feedback",
                 footerLegalTitle: "Legal",
                 footerPrivacyLink: "Política de Privacidade",
@@ -854,103 +923,18 @@
             window.currentModal = modal;
         }
 
-        // Privacy Policy modal
+        // Privacy Policy function - now redirects to local file with confirmation
         function showPrivacyPolicy() {
-            const modal = document.createElement('div');
-            modal.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.8);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 10000;
-                padding: 20px;
-            `;
-            
-            modal.innerHTML = `
-                <div style="background: white; padding: 40px; border-radius: 12px; max-width: 600px; width: 100%; max-height: 80%; overflow-y: auto;">
-                    <h2 style="margin-bottom: 20px;">Privacy Policy</h2>
-                    <div style="line-height: 1.6; color: #666;">
-                        <p style="margin-bottom: 15px;"><strong>Last updated:</strong> [DATE]</p>
-                        <p style="margin-bottom: 15px;">This Privacy Policy describes how BucketPlus ("we", "our", or "us") collects, uses, and protects your information when you use our Google Sheets add-on.</p>
-                        
-                        <h3 style="margin: 20px 0 10px 0; color: #333;">Information We Collect</h3>
-                        <p style="margin-bottom: 15px;">[Add your privacy policy content here]</p>
-                        
-                        <h3 style="margin: 20px 0 10px 0; color: #333;">How We Use Information</h3>
-                        <p style="margin-bottom: 15px;">[Add your privacy policy content here]</p>
-                        
-                        <h3 style="margin: 20px 0 10px 0; color: #333;">Data Security</h3>
-                        <p style="margin-bottom: 15px;">[Add your privacy policy content here]</p>
-                        
-                        <h3 style="margin: 20px 0 10px 0; color: #333;">Contact Us</h3>
-                        <p style="margin-bottom: 15px;">[Add your contact information here]</p>
-                    </div>
-                    <button onclick="closeModal()" style="background: var(--primary-color); color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; margin-top: 20px;">Close</button>
-                </div>
-            `;
-            
-            modal.onclick = (e) => {
-                if (e.target === modal) closeModal();
-            };
-            
-            document.body.appendChild(modal);
-            window.currentModal = modal;
+            if (confirm('Deseja visualizar nossa Política de Privacidade?')) {
+                window.open('privacypolicy.html', '_blank');
+            }
         }
 
-        // Terms of Service modal
+        // Terms of Service function - now redirects to local file with confirmation
         function showTermsOfService() {
-            const modal = document.createElement('div');
-            modal.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.8);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 10000;
-                padding: 20px;
-            `;
-            
-            modal.innerHTML = `
-                <div style="background: white; padding: 40px; border-radius: 12px; max-width: 600px; width: 100%; max-height: 80%; overflow-y: auto;">
-                    <h2 style="margin-bottom: 20px;">Terms of Service</h2>
-                    <div style="line-height: 1.6; color: #666;">
-                        <p style="margin-bottom: 15px;"><strong>Last updated:</strong> [DATE]</p>
-                        <p style="margin-bottom: 15px;">These Terms of Service ("Terms") govern your use of the BucketPlus add-on for Google Sheets.</p>
-                        
-                        <h3 style="margin: 20px 0 10px 0; color: #333;">Acceptance of Terms</h3>
-                        <p style="margin-bottom: 15px;">[Add your terms of service content here]</p>
-                        
-                        <h3 style="margin: 20px 0 10px 0; color: #333;">Use License</h3>
-                        <p style="margin-bottom: 15px;">[Add your terms of service content here]</p>
-                        
-                        <h3 style="margin: 20px 0 10px 0; color: #333;">Limitations</h3>
-                        <p style="margin-bottom: 15px;">[Add your terms of service content here]</p>
-                        
-                        <h3 style="margin: 20px 0 10px 0; color: #333;">Disclaimer</h3>
-                        <p style="margin-bottom: 15px;">[Add your terms of service content here]</p>
-                        
-                        <h3 style="margin: 20px 0 10px 0; color: #333;">Contact Information</h3>
-                        <p style="margin-bottom: 15px;">[Add your contact information here]</p>
-                    </div>
-                    <button onclick="closeModal()" style="background: var(--primary-color); color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; margin-top: 20px;">Close</button>
-                </div>
-            `;
-            
-            modal.onclick = (e) => {
-                if (e.target === modal) closeModal();
-            };
-            
-            document.body.appendChild(modal);
-            window.currentModal = modal;
+            if (confirm('Deseja visualizar nossos Termos de Serviço?')) {
+                window.open('termsandconditions.html', '_blank');
+            }
         }
 
         // Copy PIX code function
@@ -996,7 +980,7 @@
             // Initialize with default language
             updateTexts();
             
-            // Add scroll animations
+            // Add scroll animations with performance optimization
             const observerOptions = {
                 threshold: 0.1,
                 rootMargin: '0px 0px -50px 0px'
@@ -1022,7 +1006,16 @@
                 closeModal();
             }
         });
+
+        // Performance optimization: Preload critical resources
+        window.addEventListener('load', function() {
+            // Preload hover states to avoid layout shifts
+            const criticalElements = document.querySelectorAll('.feature-card, .support-option, .cta-button');
+            criticalElements.forEach(el => {
+                el.style.willChange = 'transform';
+            });
+        });
     </script>
 </body>
-</html> "Recursos",
-                footerSupportLink:
+</html>
+
