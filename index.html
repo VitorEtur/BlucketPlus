@@ -475,6 +475,7 @@
         /* Preload critical fonts */
         @font-face {
             font-family: 'system-ui';
+            src: local('system-ui'), local('Segoe UI'), local('Roboto'), local('Arial');
             font-display: swap;
         }
     </style>
@@ -611,7 +612,7 @@
                     <div>
                         <span class="feature-icon">💬</span>
                         <h3 data-i18n="feedbackTitle">Send Feedback</h3>
-                        <p data-i18n="feedbackDesc">Share your ideas and help us improve</p>
+                        <p data-i18n="feedbackDesc" style="justify-content: center;">Share your ideas and help us improve</p>
                     </div>
                     <a href="https://docs.google.com/forms/d/e/1FAIpQLSfTu6gMgMN7diWCaNauLYOVrwxt6COTwokKUHHA5qAWnY-aQA/viewform" target="_blank" class="support-btn" data-i18n="feedbackButton">Feedback</a>
                 </div>
