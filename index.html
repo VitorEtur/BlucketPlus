@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BucketPlus - Google Sheets Color Management Add-on</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2196F3;
+            --accent-color: #FF5722;
+            --text-dark: #1a1a1a;
+            --text-light: #666;
+            --bg-light: #fafafa;
+            --white: #ffffff;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.15);
+            --border-radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Language Selector */
+        .language-selector {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 8px;
+        }
+
+        .language-selector select {
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        .language-selector select:hover {
+            background: var(--bg-light);
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: var(--white);
+            padding: 120px 0 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .hero {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.2;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 40px;
+            opacity: 0.95;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: var(--white);
+            color: var(--primary-color);
+            padding: 18px 40px;
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 100px 0;
+            background: var(--bg-light);
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-dark);
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--text-dark);
+            margin-bottom: 60px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .feature-card {
+            background: var(--white);
+            padding: 40px 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+        }
+
+        .feature-card p {
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        /* How it Works Section */
+        .how-it-works {
+            padding: 100px 0;
+            background: var(--white);
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .step {
+            text-align: center;
+            position: relative;
+        }
+
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--white);
+            border-radius: 50%;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .step h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+        }
+
+        .step p {
+            color: var(--text-light);
+        }
+
+        /* Support Section */
+        .support {
+            padding: 80px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--white);
+            text-align: center;
+        }
+
+        .support-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-top: 50px;
+        }
+
+        .support-option {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: var(--transition);
+        }
+
+        .support-option:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .support-btn {
+            display: inline-block;
+            background: var(--white);
+            color: var(--primary-color);
+            padding: 12px 30px;
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: var(--transition);
+        }
+
+        .support-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--text-dark);
+            color: var(--white);
+            padding: 60px 0 30px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--white);
+        }
+
+        .footer-section a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 10px;
+            transition: var(--transition);
+        }
+
+        .footer-section a:hover {
+            color: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 30px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .language-selector {
+                position: static;
+                text-align: center;
+                margin: 20px;
+                box-shadow: none;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .steps {
+                grid-template-columns: 1fr;
+            }
+
+            .support-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading and Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in:nth-child(1) { animation-delay: 0.1s; }
+        .fade-in:nth-child(2) { animation-delay: 0.2s; }
+        .fade-in:nth-child(3) { animation-delay: 0.3s; }
+        .fade-in:nth-child(4) { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <!-- Language Selector -->
+    <div class="language-selector">
+        <select id="languageSelect" onchange="changeLanguage()">
+            <option value="en">🇺🇸 English</option>
+            <option value="pt">🇧🇷 Português</option>
+            <option value="es">🇪🇸 Español</option>
+            <option value="fr">🇫🇷 Français</option>
+        </select>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="hero">
+                <div class="logo">🪣</div>
+                <h1 data-i18n="heroTitle">BucketPlus</h1>
+                <p data-i18n="heroSubtitle">A powerful Google Sheets add-on for intelligent color management and enhanced productivity</p>
+                <a href="#features" class="cta-button" data-i18n="ctaButton">Discover Features</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <h2 class="section-title" data-i18n="featuresTitle">Powerful Features</h2>
+            <p class="section-subtitle" data-i18n="featuresSubtitle">Transform your spreadsheet workflow with intelligent color management tools</p>
+            
+            <div class="features-grid">
+                <div class="feature-card fade-in">
+                    <span class="feature-icon">🎨</span>
+                    <h3 data-i18n="feature1Title">Smart Color Application</h3>
+                    <p data-i18n="feature1Desc">Apply colors to cells and entire rows with precision. Visual organization made simple and efficient.</p>
+                </div>
+                
+                <div class="feature-card fade-in">
+                    <span class="feature-icon">⭐</span>
+                    <h3 data-i18n="feature2Title">Favorite Color Palette</h3>
+                    <p data-i18n="feature2Desc">Create and manage your custom color palette. Save frequently used colors for instant access.</p>
+                </div>
+                
+                <div class="feature-card fade-in">
+                    <span class="feature-icon">🔍</span>
+                    <h3 data-i18n="feature3Title">Search & Paint</h3>
+                    <p data-i18n="feature3Desc">Find and automatically color cells or rows containing specific text. Perfect for data categorization.</p>
+                </div>
+                
+                <div class="feature-card fade-in">
+                    <span class="feature-icon">🕒</span>
+                    <h3 data-i18n="feature4Title">Action History</h3>
+                    <p data-i18n="feature4Desc">Track your color changes with a complete history and undo functionality. Never lose your work.</p>
+                </div>
+                
+                <div class="feature-card fade-in">
+                    <span class="feature-icon">🌍</span>
+                    <h3 data-i18n="feature5Title">Multilingual Support</h3>
+                    <p data-i18n="feature5Desc">Available in Portuguese, English, Spanish, and French. Work in your preferred language.</p>
+                </div>
+                
+                <div class="feature-card fade-in">
+                    <span class="feature-icon">⚡</span>
+                    <h3 data-i18n="feature6Title">Optimized Performance</h3>
+                    <p data-i18n="feature6Desc">Built for speed and efficiency. Handles large spreadsheets without compromising performance.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it Works -->
+    <section class="how-it-works">
+        <div class="container">
+            <h2 class="section-title" data-i18n="howItWorksTitle">How It Works</h2>
+            <p class="section-subtitle" data-i18n="howItWorksSubtitle">Get started with BucketPlus in just a few simple steps</p>
+            
+            <div class="steps">
+                <div class="step fade-in">
+                    <div class="step-number">1</div>
+                    <h3 data-i18n="step1Title">Install Add-on</h3>
+                    <p data-i18n="step1Desc">Add BucketPlus to your Google Sheets from the Google Workspace Marketplace</p>
+                </div>
+                
+                <div class="step fade-in">
+                    <div class="step-number">2</div>
+                    <h3 data-i18n="step2Title">Open Sidebar</h3>
+                    <p data-i18n="step2Desc">Access BucketPlus from the Extensions menu and open the color management panel</p>
+                </div>
+                
+                <div class="step fade-in">
+                    <div class="step-number">3</div>
+                    <h3 data-i18n="step3Title">Select & Color</h3>
+                    <p data-i18n="step3Desc">Choose your cells, pick a color, and apply instantly. Use search features for advanced coloring</p>
+                </div>
+                
+                <div class="step fade-in">
+                    <div class="step-number">4</div>
+                    <h3 data-i18n="step4Title">Boost Productivity</h3>
+                    <p data-i18n="step4Desc">Enjoy organized, visually appealing spreadsheets that enhance your workflow and productivity</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Support Section -->
+    <section class="support">
+        <div class="container">
+            <h2 class="section-title" data-i18n="supportTitle">Support Development</h2>
+            <p class="section-subtitle" data-i18n="supportSubtitle">Help us continue improving BucketPlus for everyone</p>
+            
+            <div class="support-grid">
+                <div class="support-option fade-in">
+                    <span class="feature-icon">☕</span>
+                    <h3 data-i18n="kofiTitle">Buy me a coffee</h3>
+                    <p data-i18n="kofiDesc">Support development with a coffee donation</p>
+                    <a href="https://ko-fi.com/hustlei" target="_blank" class="support-btn" data-i18n="kofiButton">Ko-fi</a>
+                </div>
+                
+                <div class="support-option fade-in">
+                    <span class="feature-icon">💰</span>
+                    <h3 data-i18n="pixTitle">PIX Donation</h3>
+                    <p data-i18n="pixDesc">Support via PIX (Brazilian payment system)</p>
+                    <a href="#" onclick="showPixInfo()" class="support-btn" data-i18n="pixButton">PIX</a>
+                </div>
+                
+                <div class="support-option fade-in">
+                    <span class="feature-icon">💬</span>
+                    <h3 data-i18n="feedbackTitle">Send Feedback</h3>
+                    <p data-i18n="feedbackDesc">Share your ideas and help us improve</p>
+                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSfTu6gMgMN7diWCaNauLYOVrwxt6COTwokKUHHA5qAWnY-aQA/viewform" target="_blank" class="support-btn" data-i18n="feedbackButton">Feedback</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3 data-i18n="footerAboutTitle">About BucketPlus</h3>
+                    <p data-i18n="footerAboutDesc">BucketPlus is a Google Sheets add-on designed to enhance productivity through intelligent color management and visual organization tools.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3 data-i18n="footerLinksTitle">Quick Links</h3>
+                    <a href="#features" data-i18n="footerFeaturesLink">Features</a>
+                    <a href="https://ko-fi.com/hustlei" target="_blank" data-i18n="footerSupportLink">Support</a>
+                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSfTu6gMgMN7diWCaNauLYOVrwxt6COTwokKUHHA5qAWnY-aQA/viewform" target="_blank" data-i18n="footerFeedbackLink">Feedback</a>
+                </div>
+                
+                <div class="footer-section">
+                    <h3 data-i18n="footerLegalTitle">Legal</h3>
+                    <a href="#privacy" onclick="showPrivacyPolicy()" data-i18n="footerPrivacyLink">Privacy Policy</a>
+                    <a href="#terms" onclick="showTermsOfService()" data-i18n="footerTermsLink">Terms of Service</a>
+                </div>
+                
+                <div class="footer-section">
+                    <h3 data-i18n="footerContactTitle">Contact</h3>
+                    <p data-i18n="footerContactDesc">For support and inquiries, please use our feedback form or reach out through Ko-fi.</p>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p data-i18n="footerCopyright">© 2025 BucketPlus. Made with ❤️ for Google Sheets users worldwide.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Translations
+        const translations = {
+            en: {
+                heroTitle: "BucketPlus",
+                heroSubtitle: "A powerful Google Sheets add-on for intelligent color management and enhanced productivity",
+                ctaButton: "Discover Features",
+                featuresTitle: "Powerful Features",
+                featuresSubtitle: "Transform your spreadsheet workflow with intelligent color management tools",
+                feature1Title: "Smart Color Application",
+                feature1Desc: "Apply colors to cells and entire rows with precision. Visual organization made simple and efficient.",
+                feature2Title: "Favorite Color Palette",
+                feature2Desc: "Create and manage your custom color palette. Save frequently used colors for instant access.",
+                feature3Title: "Search & Paint",
+                feature3Desc: "Find and automatically color cells or rows containing specific text. Perfect for data categorization.",
+                feature4Title: "Action History",
+                feature4Desc: "Track your color changes with a complete history and undo functionality. Never lose your work.",
+                feature5Title: "Multilingual Support",
+                feature5Desc: "Available in Portuguese, English, Spanish, and French. Work in your preferred language.",
+                feature6Title: "Optimized Performance",
+                feature6Desc: "Built for speed and efficiency. Handles large spreadsheets without compromising performance.",
+                howItWorksTitle: "How It Works",
+                howItWorksSubtitle: "Get started with BucketPlus in just a few simple steps",
+                step1Title: "Install Add-on",
+                step1Desc: "Add BucketPlus to your Google Sheets from the Google Workspace Marketplace",
+                step2Title: "Open Sidebar",
+                step2Desc: "Access BucketPlus from the Extensions menu and open the color management panel",
+                step3Title: "Select & Color",
+                step3Desc: "Choose your cells, pick a color, and apply instantly. Use search features for advanced coloring",
+                step4Title: "Boost Productivity",
+                step4Desc: "Enjoy organized, visually appealing spreadsheets that enhance your workflow and productivity",
+                supportTitle: "Support Development",
+                supportSubtitle: "Help us continue improving BucketPlus for everyone",
+                kofiTitle: "Buy me a coffee",
+                kofiDesc: "Support development with a coffee donation",
+                kofiButton: "Ko-fi",
+                pixTitle: "PIX Donation",
+                pixDesc: "Support via PIX (Brazilian payment system)",
+                pixButton: "PIX",
+                feedbackTitle: "Send Feedback",
+                feedbackDesc: "Share your ideas and help us improve",
+                feedbackButton: "Feedback",
+                footerAboutTitle: "About BucketPlus",
+                footerAboutDesc: "BucketPlus is a Google Sheets add-on designed to enhance productivity through intelligent color management and visual organization tools.",
+                footerLinksTitle: "Quick Links",
+                footerFeaturesLink: "Features",
+                footerSupportLink: "Support",
+                footerFeedbackLink: "Feedback",
+                footerLegalTitle: "Legal",
+                footerPrivacyLink: "Privacy Policy",
+                footerTermsLink: "Terms of Service",
+                footerContactTitle: "Contact",
+                footerContactDesc: "For support and inquiries, please use our feedback form or reach out through Ko-fi.",
+                footerCopyright: "© 2025 BucketPlus. Made with ❤️ for Google Sheets users worldwide."
+            },
+            pt: {
+                heroTitle: "BucketPlus",
+                heroSubtitle: "Um poderoso complemento para Google Sheets focado em gerenciamento inteligente de cores e produtividade",
+                ctaButton: "Descobrir Recursos",
+                featuresTitle: "Recursos Poderosos",
+                featuresSubtitle: "Transforme seu fluxo de trabalho com ferramentas inteligentes de gerenciamento de cores",
+                feature1Title: "Aplicação Inteligente de Cores",
+                feature1Desc: "Aplique cores em células e linhas inteiras com precisão. Organização visual simples e eficiente.",
+                feature2Title: "Paleta de Cores Favoritas",
+                feature2Desc: "Crie e gerencie sua paleta de cores personalizada. Salve cores frequentemente usadas para acesso instantâneo.",
+                feature3Title: "Buscar e Pintar",
+                feature3Desc: "Encontre e colora automaticamente células ou linhas contendo texto específico. Perfeito para categorização de dados.",
+                feature4Title: "Histórico de Ações",
+                feature4Desc: "Acompanhe suas mudanças de cor com histórico completo e funcionalidade de desfazer. Nunca perca seu trabalho.",
+                feature5Title: "Suporte Multilíngue",
+                feature5Desc: "Disponível em Português, Inglês, Espanhol e Francês. Trabalhe no seu idioma preferido.",
+                feature6Title: "Performance Otimizada",
+                feature6Desc: "Construído para velocidade e eficiência. Lida com planilhas grandes sem comprometer a performance.",
+                howItWorksTitle: "Como Funciona",
+                howItWorksSubtitle: "Comece com o BucketPlus em apenas alguns passos simples",
+                step1Title: "Instalar Complemento",
+                step1Desc: "Adicione o BucketPlus ao seu Google Sheets através do Google Workspace Marketplace",
+                step2Title: "Abrir Painel",
+                step2Desc: "Acesse o BucketPlus pelo menu Extensões e abra o painel de gerenciamento de cores",
+                step3Title: "Selecionar e Colorir",
+                step3Desc: "Escolha suas células, selecione uma cor e aplique instantaneamente. Use recursos de busca para coloração avançada",
+                step4Title: "Aumentar Produtividade",
+                step4Desc: "Desfrute de planilhas organizadas e visualmente atraentes que melhoram seu fluxo de trabalho e produtividade",
+                supportTitle: "Apoiar Desenvolvimento",
+                supportSubtitle: "Ajude-nos a continuar melhorando o BucketPlus para todos",
+                kofiTitle: "Me pague um café",
+                kofiDesc: "Apoie o desenvolvimento com uma doação de café",
+                kofiButton: "Ko-fi",
+                pixTitle: "Doação PIX",
+                pixDesc: "Apoie via PIX (sistema de pagamento brasileiro)",
+                pixButton: "PIX",
+                feedbackTitle: "Enviar Feedback",
+                feedbackDesc: "Compartilhe suas ideias e nos ajude a melhorar",
+                feedbackButton: "Feedback",
+                footerAboutTitle: "Sobre o BucketPlus",
+                footerAboutDesc: "BucketPlus é um complemento do Google Sheets projetado para aumentar a produtividade através de ferramentas inteligentes de gerenciamento de cores e organização visual.",
+                footerLinksTitle: "Links Rápidos",
+                footerFeaturesLink: "Recursos",
+                footerSupportLink: "Apoio",
+                footerFeedbackLink: "Feedback",
+                footerLegalTitle: "Legal",
+                footerPrivacyLink: "Política de Privacidade",
+                footerTermsLink: "Termos de Serviço",
+                footerContactTitle: "Contato",
+                footerContactDesc: "Para suporte e consultas, use nosso formulário de feedback ou entre em contato através do Ko-fi.",
+                footerCopyright: "© 2025 BucketPlus. Feito com ❤️ para usuários do Google Sheets em todo o mundo."
+            },
+            es: {
+                heroTitle: "BucketPlus",
+                heroSubtitle: "Un poderoso complemento para Google Sheets enfocado en gestión inteligente de colores y productividad",
+                ctaButton: "Descubrir Características",
+                featuresTitle: "Características Poderosas",
+                featuresSubtitle: "Transforma tu flujo de trabajo con herramientas inteligentes de gestión de colores",
+                feature1Title: "Aplicación Inteligente de Colores",
+                feature1Desc: "Aplica colores a celdas y filas completas con precisión. Organización visual simple y eficiente.",
+                feature2Title: "Paleta de Colores Favoritos",
+                feature2Desc: "Crea y gestiona tu paleta de colores personalizada. Guarda colores usados frecuentemente para acceso instantáneo.",
+                feature3Title: "Buscar y Pintar",
+                feature3Desc: "Encuentra y colorea automáticamente celdas o filas que contengan texto específico. Perfecto para categorización de datos.",
+                feature4Title: "Historial de Acciones",
+                feature4Desc: "Rastrea tus cambios de color con historial completo y funcionalidad de deshacer. Nunca pierdas tu trabajo.",
+                feature5Title: "Soporte Multiidioma",
+                feature5Desc: "Disponible en Portugués, Inglés, Español y Francés. Trabaja en tu idioma preferido.",
+                feature6Title: "Rendimiento Optimizado",
+                feature6Desc: "Construido para velocidad y eficiencia. Maneja hojas de cálculo grandes sin comprometer el rendimiento.",
+                howItWorksTitle: "Cómo Funciona",
+                howItWorksSubtitle: "Comienza con BucketPlus en solo unos pocos pasos simples",
+                step1Title: "Instalar Complemento",
+                step1Desc: "Agrega BucketPlus a tu Google Sheets desde Google Workspace Marketplace",
+                step2Title: "Abrir Panel",
+                step2Desc: "Accede a BucketPlus desde el menú Extensiones y abre el panel de gestión de colores",
+                step3Title: "Seleccionar y Colorear",
+                step3Desc: "Elige tus celdas, selecciona un color y aplica instantáneamente. Usa características de búsqueda para coloración avanzada",
+                step4Title: "Aumentar Productividad",
+                step4Desc: "Disfruta de hojas de cálculo organizadas y visualmente atractivas que mejoran tu flujo de trabajo y productividad",
+                supportTitle: "Apoyar Desarrollo",
+                supportSubtitle: "Ayúdanos a continuar mejorando BucketPlus para todos",
+                kofiTitle: "Cómprame un café",
+                kofiDesc: "Apoya el desarrollo con una donación de café",
+                kofiButton: "Ko-fi",
+                pixTitle: "Donación PIX",
+                pixDesc: "Apoya vía PIX (sistema de pago brasileño)",
+                pixButton: "PIX",
+                feedbackTitle: "Enviar Comentarios",
+                feedbackDesc: "Comparte tus ideas y ayúdanos a mejorar",
+                feedbackButton: "Comentarios",
+                footerAboutTitle: "Sobre BucketPlus",
+                footerAboutDesc: "BucketPlus es un complemento de Google Sheets diseñado para mejorar la productividad a través de herramientas inteligentes de gestión de colores y organización visual.",
+                footerLinksTitle: "Enlaces Rápidos",
+                footerFeaturesLink: "Características",
+                footerSupportLink: "Apoyo",
+                footerFeedbackLink: "Comentarios",
+                footerLegalTitle: "Legal",
+                footerPrivacyLink: "Política de Privacidad",
+                footerTermsLink: "Términos de Servicio",
+                footerContactTitle: "Contacto",
+                footerContactDesc: "Para soporte y consultas, usa nuestro formulario de comentarios o contáctanos a través de Ko-fi.",
+                footerCopyright: "© 2025 BucketPlus. Hecho con ❤️ para usuarios de Google Sheets en todo el mundo."
+            },
+            fr: {
+                heroTitle: "BucketPlus",
+                heroSubtitle: "Un puissant complément pour Google Sheets axé sur la gestion intelligente des couleurs et la productivité",
+                ctaButton: "Découvrir les Fonctionnalités",
+                featuresTitle: "Fonctionnalités Puissantes",
+                featuresSubtitle: "Transformez votre flux de travail avec des outils intelligents de gestion des couleurs",
+                feature1Title: "Application Intelligente des Couleurs",
+                feature1Desc: "Appliquez des couleurs aux cellules et aux lignes entières avec précision. Organisation visuelle simple et efficace.",
+                feature2Title: "Palette de Couleurs Favorites",
+                feature2Desc: "Créez et gérez votre palette de couleurs personnalisée. Sauvegardez les couleurs fréquemment utilisées pour un accès instantané.",
+                feature3Title: "Rechercher et Peindre",
+                feature3Desc: "Trouvez et colorez automatiquement les cellules ou lignes contenant du texte spécifique. Parfait pour la catégorisation des données.",
+                feature4Title: "Historique des Actions",
+                feature4Desc: "Suivez vos changements de couleur avec un historique complet et une fonctionnalité d'annulation. Ne perdez jamais votre travail.",
+                feature5Title: "Support Multilingue",
+                feature5Desc: "Disponible en Portugais, Anglais, Espagnol et Français. Travaillez dans votre langue préférée.",
+                feature6Title: "Performance Optimisée",
+                feature6Desc: "Conçu pour la vitesse et l'efficacité. Gère les grandes feuilles de calcul sans compromettre les performances.",
+                howItWorksTitle: "Comment Ça Marche",
+                howItWorksSubtitle: "Commencez avec BucketPlus en quelques étapes simples",
+                step1Title: "Installer le Complément",
+                step1Desc: "Ajoutez BucketPlus à votre Google Sheets depuis Google Workspace Marketplace",
+                step2Title: "Ouvrir le Panneau",
+                step2Desc: "Accédez à BucketPlus depuis le menu Extensions et ouvrez le panneau de gestion des couleurs",
+                step3Title: "Sélectionner et Colorer",
+                step3Desc: "Choisissez vos cellules, sélectionnez une couleur et appliquez instantanément. Utilisez les fonctionnalités de recherche pour une coloration avancée",
+                step4Title: "Booster la Productivité",
+                step4Desc: "Profitez de feuilles de calcul organisées et visuellement attrayantes qui améliorent votre flux de travail et votre productivité",
+                supportTitle: "Soutenir le Développement",
+                supportSubtitle: "Aidez-nous à continuer à améliorer BucketPlus pour tous",
+                kofiTitle: "Offrez-moi un café",
+                kofiDesc: "Soutenez le développement avec un don de café",
+                kofiButton: "Ko-fi",
+                pixTitle: "Don PIX",
+                pixDesc: "Soutenez via PIX (système de paiement brésilien)",
+                pixButton: "PIX",
+                feedbackTitle: "Envoyer des Commentaires",
+                feedbackDesc: "Partagez vos idées et aidez-nous à nous améliorer",
+                feedbackButton: "Commentaires",
+                footerAboutTitle: "À Propos de BucketPlus",
+                footerAboutDesc: "BucketPlus est un complément Google Sheets conçu pour améliorer la productivité grâce à des outils intelligents de gestion des couleurs et d'organisation visuelle.",
+                footerLinksTitle: "Liens Rapides",
+                footerFeaturesLink: "Fonctionnalités",
+                footerSupportLink: "Support",
+                footerFeedbackLink: "Commentaires",
+                footerLegalTitle: "Légal",
+                footerPrivacyLink: "Politique de Confidentialité",
+                footerTermsLink: "Conditions d'Utilisation",
+                footerContactTitle: "Contact",
+                footerContactDesc: "Pour le support et les demandes, veuillez utiliser notre formulaire de commentaires ou nous contacter via Ko-fi.",
+                footerCopyright: "© 2025 BucketPlus. Fait avec ❤️ pour les utilisateurs de Google Sheets du monde entier."
+            }
+        };
+
+        let currentLanguage = 'en';
+
+        // Language change function
+        function changeLanguage() {
+            const select = document.getElementById('languageSelect');
+            currentLanguage = select.value;
+            updateTexts();
+        }
+
+        // Update all texts based on current language
+        function updateTexts() {
+            const elements = document.querySelectorAll('[data-i18n]');
+            elements.forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[currentLanguage] && translations[currentLanguage][key]) {
+                    element.textContent = translations[currentLanguage][key];
+                }
+            });
+        }
+
+        // PIX info modal
+        function showPixInfo() {
+            const pixCode = "00020126580014br.gov.bcb.pix0136ef2a923c-4039-4eb5-adae-eedd18042ef15204000053039865802BR5925Vitor Tchunwen Etur Huang6009Sao Paulo62290525REC687E7E7F5758802256180063048309";
+            
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+                padding: 20px;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: white; padding: 40px; border-radius: 12px; text-align: center; max-width: 400px; width: 100%;">
+                    <h3 style="margin-bottom: 20px;">PIX Donation</h3>
+                    <img src="img/pix.png" alt="QR Code PIX" style="width: 200px; height: 200px; margin-bottom: 20px; border: 2px solid #ddd; border-radius: 8px;">
+                    <p style="font-size: 12px; word-break: break-all; background: #f5f5f5; padding: 10px; border-radius: 4px; margin-bottom: 20px;">${pixCode}</p>
+                    <button onclick="copyPixCode('${pixCode}')" style="background: #32BCAD; color: white; border: none; padding: 12px 24px; border-radius: 6px; margin-right: 10px; cursor: pointer;">Copy Code</button>
+                    <button onclick="closeModal()" style="background: #666; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer;">Close</button>
+                </div>
+            `;
+            
+            modal.onclick = (e) => {
+                if (e.target === modal) closeModal();
+            };
+            
+            document.body.appendChild(modal);
+            window.currentModal = modal;
+        }
+
+        // Privacy Policy modal
+        function showPrivacyPolicy() {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+                padding: 20px;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: white; padding: 40px; border-radius: 12px; max-width: 600px; width: 100%; max-height: 80%; overflow-y: auto;">
+                    <h2 style="margin-bottom: 20px;">Privacy Policy</h2>
+                    <div style="line-height: 1.6; color: #666;">
+                        <p style="margin-bottom: 15px;"><strong>Last updated:</strong> [DATE]</p>
+                        <p style="margin-bottom: 15px;">This Privacy Policy describes how BucketPlus ("we", "our", or "us") collects, uses, and protects your information when you use our Google Sheets add-on.</p>
+                        
+                        <h3 style="margin: 20px 0 10px 0; color: #333;">Information We Collect</h3>
+                        <p style="margin-bottom: 15px;">[Add your privacy policy content here]</p>
+                        
+                        <h3 style="margin: 20px 0 10px 0; color: #333;">How We Use Information</h3>
+                        <p style="margin-bottom: 15px;">[Add your privacy policy content here]</p>
+                        
+                        <h3 style="margin: 20px 0 10px 0; color: #333;">Data Security</h3>
+                        <p style="margin-bottom: 15px;">[Add your privacy policy content here]</p>
+                        
+                        <h3 style="margin: 20px 0 10px 0; color: #333;">Contact Us</h3>
+                        <p style="margin-bottom: 15px;">[Add your contact information here]</p>
+                    </div>
+                    <button onclick="closeModal()" style="background: var(--primary-color); color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; margin-top: 20px;">Close</button>
+                </div>
+            `;
+            
+            modal.onclick = (e) => {
+                if (e.target === modal) closeModal();
+            };
+            
+            document.body.appendChild(modal);
+            window.currentModal = modal;
+        }
+
+        // Terms of Service modal
+        function showTermsOfService() {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+                padding: 20px;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: white; padding: 40px; border-radius: 12px; max-width: 600px; width: 100%; max-height: 80%; overflow-y: auto;">
+                    <h2 style="margin-bottom: 20px;">Terms of Service</h2>
+                    <div style="line-height: 1.6; color: #666;">
+                        <p style="margin-bottom: 15px;"><strong>Last updated:</strong> [DATE]</p>
+                        <p style="margin-bottom: 15px;">These Terms of Service ("Terms") govern your use of the BucketPlus add-on for Google Sheets.</p>
+                        
+                        <h3 style="margin: 20px 0 10px 0; color: #333;">Acceptance of Terms</h3>
+                        <p style="margin-bottom: 15px;">[Add your terms of service content here]</p>
+                        
+                        <h3 style="margin: 20px 0 10px 0; color: #333;">Use License</h3>
+                        <p style="margin-bottom: 15px;">[Add your terms of service content here]</p>
+                        
+                        <h3 style="margin: 20px 0 10px 0; color: #333;">Limitations</h3>
+                        <p style="margin-bottom: 15px;">[Add your terms of service content here]</p>
+                        
+                        <h3 style="margin: 20px 0 10px 0; color: #333;">Disclaimer</h3>
+                        <p style="margin-bottom: 15px;">[Add your terms of service content here]</p>
+                        
+                        <h3 style="margin: 20px 0 10px 0; color: #333;">Contact Information</h3>
+                        <p style="margin-bottom: 15px;">[Add your contact information here]</p>
+                    </div>
+                    <button onclick="closeModal()" style="background: var(--primary-color); color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; margin-top: 20px;">Close</button>
+                </div>
+            `;
+            
+            modal.onclick = (e) => {
+                if (e.target === modal) closeModal();
+            };
+            
+            document.body.appendChild(modal);
+            window.currentModal = modal;
+        }
+
+        // Copy PIX code function
+        function copyPixCode(code) {
+            navigator.clipboard.writeText(code).then(() => {
+                alert('PIX code copied to clipboard!');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = code;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('PIX code copied to clipboard!');
+            });
+        }
+
+        // Close modal function
+        function closeModal() {
+            if (window.currentModal) {
+                document.body.removeChild(window.currentModal);
+                window.currentModal = null;
+            }
+        }
+
+        // Smooth scrolling for anchor links
+        document.addEventListener('DOMContentLoaded', function() {
+            const links = document.querySelectorAll('a[href^="#"]');
+            links.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+
+            // Initialize with default language
+            updateTexts();
+            
+            // Add scroll animations
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animationPlayState = 'running';
+                    }
+                });
+            }, observerOptions);
+            
+            document.querySelectorAll('.fade-in').forEach(el => {
+                el.style.animationPlayState = 'paused';
+                observer.observe(el);
+            });
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && window.currentModal) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html> "Recursos",
+                footerSupportLink:
